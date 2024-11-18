@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClCompile Include="src\cube.cpp" />
     <ClCompile Include="src\InitShader.cpp" />
+    <ClCompile Include="src\sphere.cpp" />
     <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\cube.h" />
+    <ClInclude Include="src\sphere.h" />
     <ClInclude Include="texture.hpp" />
   </ItemGroup>
   <ItemGroup>

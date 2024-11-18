@@ -226,6 +226,7 @@ void drawPerson(glm::mat4 personMat)
     bodyMat = glm::translate(personMat, glm::vec3(0, jump, 0));
     modelMat = glm::scale(bodyMat, glm::vec3(0.5, 1, 0.3));
     pvmMat = projectMat * viewMat * modelMat;
+
     glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
     glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
     glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
