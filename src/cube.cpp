@@ -18,7 +18,14 @@ GLuint pvmMatrixID;
 
 float rotAngle = 0.0f;
 
-float rightUpperArmAngle = 0.0f, rightLowerArmAngle = 0.0f, rightUpperLegAngle = 0.0f, rightLowerLegAngle = 0.0f, leftUpperArmAngle = 0.0f, leftLowerArmAngle = 0.0f, leftUpperLegAngle = 0.0f, leftLowerLegAngle = 0.0f;
+float rightUpperArmAngle = 0.0f, 
+rightLowerArmAngle = 0.0f,
+rightUpperLegAngle = 0.0f,
+rightLowerLegAngle = 0.0f,
+leftUpperArmAngle = 0.0f,
+leftLowerArmAngle = 0.0f,
+leftUpperLegAngle = 0.0f,
+leftLowerLegAngle = 0.0f;
 
 typedef glm::vec4  color4;
 typedef glm::vec4  point4;
@@ -38,24 +45,15 @@ point4 vertices[8] = {
 	point4(0.5, -0.5, -0.5, 1.0)
 };
 
-// RGBA colors
-color4 vertex_colors[8] = {
-	color4(0.0, 0.0, 0.0, 1.0),  // black
-	color4(0.0, 1.0, 1.0, 1.0),   // cyan
-	color4(1.0, 0.0, 1.0, 1.0),  // magenta
-	color4(1.0, 1.0, 0.0, 1.0),  // yellow
-	color4(1.0, 0.0, 0.0, 1.0),  // red
-	color4(0.0, 1.0, 0.0, 1.0),  // green
-	color4(0.0, 0.0, 1.0, 1.0),  // blue
-	color4(1.0, 1.0, 1.0, 1.0)  // white
-};
-
 //----------------------------------------------------------------------------
 // Texture
 enum eShadeMode { NO_LIGHT, GOURAUD, PHONG, NUM_LIGHT_MODE };
 
 int shadeMode = NO_LIGHT;
 int isTexture = false;
+
+GLint vPosition;
+GLint vNormal;
 
 GLuint projectMatrixID;
 GLuint viewMatrixID;
@@ -179,6 +177,10 @@ init()
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points), sizeof(normals), normals);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(normals), sizeof(texCoords), texCoords);
 
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(normals) + sizeof(texCoords), NULL, GL_STATIC_DRAW);
+	//glEnable(GL_TEXTURE_2D);
+
+
 	// Load shaders and use the resulting shader program
 	GLuint program = InitShader("src/vshader.glsl", "src/fshader.glsl");
 	glUseProgram(program);
@@ -194,9 +196,12 @@ init()
 	glEnableVertexAttribArray(vColor);
 	glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0,
 		BUFFER_OFFSET(sizeof(points)));
-
+	
 	pvmMatrixID = glGetUniformLocation(program, "mPVM");
 	*/
+	//---------------------------------------
+
+	
 
 	//---------------------------------------
 	// Texture
@@ -227,6 +232,7 @@ init()
 
 	projectMat = glm::perspective(glm::radians(65.0f), 1.0f, 0.1f, 100.0f);
 	viewMat = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	
 
 	//---------------------------------------
 	// Load the texture
@@ -265,11 +271,15 @@ void drawCubeMan(glm::mat4 worldMat) {
 	modelMat = glm::scale(worldMat, glm::vec3(0.4, 1.0, 0.2));
 	pvmMat = projectMat * viewMat * modelMat;
 	//glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+	//modelMat = projectMat * viewMat * modelMat;
 
 	// Texture
 	glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
+	/*
+	glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
 	glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
 	glUniformMatrix4fv(projectMatrixID, 1, GL_FALSE, &projectMat[0][0]);
+	*/
 
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
@@ -279,9 +289,12 @@ void drawCubeMan(glm::mat4 worldMat) {
 	modelMat = glm::translate(worldMat, glm::vec3(0, 0.6, 0));	// P*V*C*T*S*v
 	modelMat = glm::scale(modelMat, glm::vec3(0.2, 0.2, 0.2));
 	pvmMat = projectMat * viewMat * modelMat;
-	//glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
-	//glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	//modelMat = projectMat * viewMat * modelMat;
+
 	// Texture
+	/*
 	glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
 	glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
 	glUniformMatrix4fv(projectMatrixID, 1, GL_FALSE, &projectMat[0][0]);
@@ -291,7 +304,8 @@ void drawCubeMan(glm::mat4 worldMat) {
 	glDrawArrays(GL_TRIANGLES, 9, 11);
 	glBindTexture(GL_TEXTURE_2D, Texture);
 	glDrawArrays(GL_TRIANGLES, 12, 36);
-
+	
+	*/
 
 	// 팔, 다리들
 	glBindTexture(GL_TEXTURE_2D, Texture);	// Bind Our Texture
@@ -315,11 +329,15 @@ void drawCubeMan(glm::mat4 worldMat) {
 
 			pvmMat = projectMat * viewMat * upperArmMat;
 
-			//glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
-			// Texture
+			glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+			//modelMat = projectMat * viewMat * upperArmMat;
+
+			// Texture 
+			/*
 			glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
 			glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
 			glUniformMatrix4fv(projectMatrixID, 1, GL_FALSE, &projectMat[0][0]);
+			*/
 
 			glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 			
@@ -328,11 +346,16 @@ void drawCubeMan(glm::mat4 worldMat) {
 			glm::mat4 lowerArmMat = glm::scale(modelMat, glm::vec3(0.1, 0.4, 0.1));
 			pvmMat = projectMat * viewMat * lowerArmMat;
 
-			//glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+			glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+			//modelMat = projectMat * viewMat * lowerArmMat;
+
 			// Texture
+			/*
 			glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
+
 			glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
 			glUniformMatrix4fv(projectMatrixID, 1, GL_FALSE, &projectMat[0][0]);
+			*/
 
 			glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 		}
@@ -342,11 +365,17 @@ void drawCubeMan(glm::mat4 worldMat) {
 			glm::mat4 upperLegMat = glm::scale(modelMat, glm::vec3(0.1, 0.4, 0.1));
 
 			pvmMat = projectMat * viewMat * upperLegMat;
-			//glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+			glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+			//modelMat = projectMat * viewMat * upperLegMat;
+
 			// Texture
+			/*
 			glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
+		
+
 			glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
 			glUniformMatrix4fv(projectMatrixID, 1, GL_FALSE, &projectMat[0][0]);
+			*/
 
 			glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
@@ -355,11 +384,17 @@ void drawCubeMan(glm::mat4 worldMat) {
 			glm::mat4 lowerLegMat = glm::scale(modelMat, glm::vec3(0.1, 0.4, 0.1));
 
 			pvmMat = projectMat * viewMat * lowerLegMat;
-			//glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+			glUniformMatrix4fv(pvmMatrixID, 1, GL_FALSE, &pvmMat[0][0]);
+			//modelMat = projectMat * viewMat * lowerLegMat;
+
 			// Texture
+			/*
 			glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMat[0][0]);
+	
+
 			glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, &viewMat[0][0]);
 			glUniformMatrix4fv(projectMatrixID, 1, GL_FALSE, &projectMat[0][0]);
+			*/
 
 			glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 		}
